@@ -17,7 +17,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            //说明so的路径为该libs路径，关联所有地图SDK的so文件
+            jniLibs.srcDir 'libs'
+        }
+    }
+
 }
+
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -36,4 +46,23 @@ dependencies {
     //Glider
     //api 'com.github.bumptech.glide:glide:4.9.0'
 
+    //让app包，与新添加的这个OpenCV库关联
+    implementation project(':openCVLibrary341')
+    //将打好jar包，添加到依赖中
+    //implementation fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
+
+
+
+//以下很重要
+//将添加的.so文件，打包成jar
+task nativeLibsToJar(type: Jar, description: 'create a jar archive of the native libs') {
+    destinationDir file("$buildDir/native-libs")
+    baseName 'native-libs'
+    from fileTree(dir: 'libs', include: '**/*.so')
+    into 'lib/'
+}
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn(nativeLibsToJar)
+}
+

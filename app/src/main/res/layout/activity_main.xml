@@ -15,7 +15,23 @@
 
 
 
+    <TextView
+        android:id="@+id/gary_test"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@+id/btn_a"
+        android:layout_marginLeft="10dp"
+        android:background="@color/bar_grey"
+        android:textColor="@color/white"
+        android:text="灰度测试"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:layout_width="130dp"
+        android:layout_height="40dp" />
+
+
+
     <LinearLayout
+        android:id="@+id/btn_a"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
