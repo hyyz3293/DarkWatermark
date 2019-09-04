@@ -3,6 +3,7 @@ package com.jack.tag.utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
@@ -35,10 +36,10 @@ public class ImgWatermarkUtil {
         Core.dft(complexImage, complexImage);
         // 添加文本水印
         Scalar scalar = new Scalar(0, 0, 0);
-        Point point = new Point(40, 40);
-        Core.putText(complexImage, watermarkText, point, Core.FONT_HERSHEY_DUPLEX, 1D, scalar);
+        Point point = new Point(200, 200);
+        Imgproc.putText(complexImage, watermarkText, point, Core.FONT_HERSHEY_DUPLEX, 20D, scalar);
         Core.flip(complexImage, complexImage, -1);
-        Core.putText(complexImage, watermarkText, point, Core.FONT_HERSHEY_DUPLEX, 1D, scalar);
+        Imgproc.putText(complexImage, watermarkText, point, Core.FONT_HERSHEY_DUPLEX, 20D, scalar);
         Core.flip(complexImage, complexImage, -1);
         return antitransformImage(complexImage, allPlanes);
     }
@@ -108,8 +109,8 @@ public class ImgWatermarkUtil {
         Mat padded = new Mat();
         int addPixelRows = Core.getOptimalDFTSize(image.rows());
         int addPixelCols = Core.getOptimalDFTSize(image.cols());
-        Imgproc.copyMakeBorder(image, padded, 0, addPixelRows - image.rows(), 0, addPixelCols - image.cols(),
-                Imgproc.BORDER_CONSTANT, Scalar.all(0));
+        Core.copyMakeBorder(image, padded, 0, addPixelRows - image.rows(), 0, addPixelCols - image.cols(),
+                Core.BORDER_CONSTANT, Scalar.all(0));
 
         return padded;
     }

@@ -1,10 +1,9 @@
 package com.jack.tag.utils;
 
-import android.graphics.Point;
-
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
@@ -66,10 +65,10 @@ public class DFTUtil {
 
 
         // 频谱图上添加文本
-        //Core.putText(complexImage, watermarkText, point, Core.FONT_HERSHEY_DUPLEX, fontSize, scalar,2);
+        Imgproc.putText(complexImage, watermarkText, point, Core.FONT_HERSHEY_DUPLEX, fontSize, scalar,2);
 
         Core.flip(complexImage, complexImage, -1);
-        //Core.putText(complexImage, watermarkText, point, Core.FONT_HERSHEY_DUPLEX, fontSize, scalar,2);
+        Imgproc.putText(complexImage, watermarkText, point, Core.FONT_HERSHEY_DUPLEX, fontSize, scalar,2);
         Core.flip(complexImage, complexImage, -1);
 
         planes.clear();
@@ -114,7 +113,7 @@ public class DFTUtil {
      *            the complex image obtained from the DFT
      * @return the optimized image
      */
-    private Mat createOptimizedMagnitude(Mat complexImage) {
+    public static Mat createOptimizedMagnitude(Mat complexImage) {
         // init
         List<Mat> newPlanes = new ArrayList<>();
         Mat mag = new Mat();
@@ -127,7 +126,7 @@ public class DFTUtil {
         Core.add(Mat.ones(mag.size(), CvType.CV_32F), mag, mag);
         Core.log(mag, mag);
         // optionally reorder the 4 quadrants of the magnitude image
-        this.shiftDFT(mag);
+        shiftDFT(mag);
         // normalize the magnitude image for the visualization since both JavaFX
         // and OpenCV need images with value between 0 and 255
         // convert back to CV_8UC1
@@ -144,7 +143,7 @@ public class DFTUtil {
      * @param image
      *            the {@link Mat} object whose quadrants are to reorder
      */
-    private void shiftDFT(Mat image) {
+    public static void shiftDFT(Mat image) {
         image = image.submat(new org.opencv.core.Rect(0, 0, image.cols() & -2, image.rows() & -2));
         int cx = image.cols() / 2;
         int cy = image.rows() / 2;
