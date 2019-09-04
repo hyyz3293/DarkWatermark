@@ -11,6 +11,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
@@ -144,8 +145,9 @@ public class OpcvImgUtils {
         Mat padded = new Mat();
         int addPixelRows = Core.getOptimalDFTSize(image.rows());
         int addPixelCols = Core.getOptimalDFTSize(image.cols());
+        //Imgcodecs.IMREAD_COLOR-->BORDER_CONSTANT
         Core.copyMakeBorder(image, padded, 0, addPixelRows - image.rows(), 0, addPixelCols - image.cols(),
-                Core.BORDER_CONSTANT, Scalar.all(0));
+                Core.BORDER_REPLICATE, Scalar.all(0));
 
         return padded;
     }

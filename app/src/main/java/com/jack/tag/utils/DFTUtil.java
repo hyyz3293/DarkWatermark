@@ -6,6 +6,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
@@ -46,7 +47,14 @@ public class DFTUtil {
         return magnitude;
     }
 
-    public void transformImageWithText(Mat image, String watermarkText, Point point, Double fontSize, Scalar scalar) {
+
+    public Mat transformImageWithText(Mat image, String watermarkText) {
+        Scalar scalar = new Scalar(0, 0, 0);
+        Point point = new Point(50, 50);
+       return transformImageWithText(image, watermarkText, point, 1D, scalar);
+    }
+
+    public Mat transformImageWithText(Mat image, String watermarkText, Point point, Double fontSize, Scalar scalar) {
         // planes数组中存的通道数若开始不为空,需清空.
         if (!planes.isEmpty()) {
             planes.clear();
@@ -62,16 +70,15 @@ public class DFTUtil {
         Core.merge(planes, complexImage);
         // dft
         Core.dft(complexImage, complexImage);
-
-
         // 频谱图上添加文本
         Imgproc.putText(complexImage, watermarkText, point, Core.FONT_HERSHEY_DUPLEX, fontSize, scalar,2);
-
         Core.flip(complexImage, complexImage, -1);
         Imgproc.putText(complexImage, watermarkText, point, Core.FONT_HERSHEY_DUPLEX, fontSize, scalar,2);
         Core.flip(complexImage, complexImage, -1);
 
         planes.clear();
+
+        return padded;
     }
 
     public Mat antitransformImage() {
@@ -91,18 +98,17 @@ public class DFTUtil {
      * @return the image whose dimensions have been optimized
      */
     private Mat optimizeImageDim(Mat image) {
-//        // init
-//        Mat padded = new Mat();
-//        // get the optimal rows size for dft
-//        int addPixelRows = Core.getOptimalDFTSize(image.rows());
-//        // get the optimal cols size for dft
-//        int addPixelCols = Core.getOptimalDFTSize(image.cols());
-//        // apply the optimal cols and rows size to the image
-//        Imgproc.copyMakeBorder(image, padded, 0, addPixelRows - image.rows(), 0, addPixelCols - image.cols(),
-//                Imgproc.BORDER_CONSTANT, Scalar.all(0));
-//
-//        return padded;
-        return image;
+        // init
+        Mat padded = new Mat();
+        // get the optimal rows size for dft
+        int addPixelRows = Core.getOptimalDFTSize(image.rows());
+        // get the optimal cols size for dft
+        int addPixelCols = Core.getOptimalDFTSize(image.cols());
+        // apply the optimal cols and rows size to the image
+        Core.copyMakeBorder(image, padded, 0, addPixelRows - image.rows(), 0, addPixelCols - image.cols(),
+                Core.BORDER_CONSTANT, Scalar.all(0));
+
+        return padded;
     }
 
     /**
@@ -113,7 +119,7 @@ public class DFTUtil {
      *            the complex image obtained from the DFT
      * @return the optimized image
      */
-    public static Mat createOptimizedMagnitude(Mat complexImage) {
+    private Mat createOptimizedMagnitude(Mat complexImage) {
         // init
         List<Mat> newPlanes = new ArrayList<>();
         Mat mag = new Mat();
@@ -126,7 +132,7 @@ public class DFTUtil {
         Core.add(Mat.ones(mag.size(), CvType.CV_32F), mag, mag);
         Core.log(mag, mag);
         // optionally reorder the 4 quadrants of the magnitude image
-        shiftDFT(mag);
+        this.shiftDFT(mag);
         // normalize the magnitude image for the visualization since both JavaFX
         // and OpenCV need images with value between 0 and 255
         // convert back to CV_8UC1
@@ -143,12 +149,12 @@ public class DFTUtil {
      * @param image
      *            the {@link Mat} object whose quadrants are to reorder
      */
-    public static void shiftDFT(Mat image) {
-        image = image.submat(new org.opencv.core.Rect(0, 0, image.cols() & -2, image.rows() & -2));
+    private void shiftDFT(Mat image) {
+        image = image.submat(new Rect(0, 0, image.cols() & -2, image.rows() & -2));
         int cx = image.cols() / 2;
         int cy = image.rows() / 2;
 
-        Mat q0 = new Mat(image, new org.opencv.core.Rect(0, 0, cx, cy));
+        Mat q0 = new Mat(image, new Rect(0, 0, cx, cy));
         Mat q1 = new Mat(image, new Rect(cx, 0, cx, cy));
         Mat q2 = new Mat(image, new Rect(0, cy, cx, cy));
         Mat q3 = new Mat(image, new Rect(cx, cy, cx, cy));

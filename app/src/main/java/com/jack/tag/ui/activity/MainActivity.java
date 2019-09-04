@@ -10,17 +10,19 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 
+import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.PermissionUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.bumptech.glide.Glide;
 import com.jack.tag.R;
-import com.jack.tag.utils.DFTUtil;
-import com.jack.tag.utils.ImageUtils;
+import com.jack.tag.utils.ImgUtils;
+import com.jack.tag.utils.ImgWatermarkUtil;
+
 import com.jack.tag.utils.OpcvImgUtils;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
@@ -39,8 +41,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ImageView img, imgTest;
+    private ImageView img, imgTest, imgTest2;
     private List<LocalMedia> selectList;
+
+    private String path = "", filePath = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initView() {
         img = findViewById(R.id.img);
         imgTest = findViewById(R.id.img_test);
+        imgTest2 = findViewById(R.id.img_test2);
 
         findViewById(R.id.tv_change).setOnClickListener(this);
         findViewById(R.id.tv_add).setOnClickListener(this);
@@ -71,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initData() {
         selectList = new ArrayList<>();
 
-        Glide.with(this).load(R.mipmap.a).into(img);
+        Glide.with(this).load(R.mipmap.ope).into(img);
     }
 
     @Override
@@ -97,12 +102,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void addWaterMark() {
         try {
-            Mat imgMat = Utils.loadResource(this, R.mipmap.a); //Imgcodecs.IMREAD_COLOR
-            Mat imageMat = OpcvImgUtils.addImageWatermarkWithText(imgMat, "JACK");
+            Mat imgMat = Utils.loadResource(this, R.mipmap.ope); //Imgcodecs.IMREAD_COLOR /, Imgcodecs.IMREAD_COLOR
+            Mat imageMat = OpcvImgUtils.addImageWatermarkWithText(imgMat, "JACK --- 6666666666666");
 
-//            Mat showMat = OpcvImgUtils.getImageWatermarkWithText(imageMat);
-//            Bitmap  bt3 = Bitmap.createBitmap(showMat.cols(), showMat.rows(), Bitmap.Config.RGB_565);
-//            Utils.matToBitmap(showMat, bt3);
+
 
            // DFTUtil.getInstance().createOptimizedMagnitude(imageMat);
 
@@ -110,18 +113,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bt3 = Bitmap.createBitmap(imageMat.cols(), imageMat.rows(), Bitmap.Config.RGB_565);
             Utils.matToBitmap(imageMat, bt3);
 
-            String path = "";
+
             File root = new File(Environment.getExternalStorageDirectory().getAbsoluteFile(), "WaterMark");
             if ((root.exists() || root.mkdir()) && root.isDirectory()) {
-                path = root.getAbsolutePath();
+                filePath = root.getAbsolutePath();
             }
-            path = path + "/" + ImageUtils.getTimeStampFileName(0);
-            ImageUtils.saveImage(bt3, path);
+            path = filePath + "/" + ImgUtils.getTimeStampFileName(0);
+            ImageUtils.save(bt3, path,  Bitmap.CompressFormat.PNG);
             LogUtils.e(path);
             Glide.with(this).load(path).into(imgTest);
 
 
-            //imgTest.setImageBitmap(bt3);
+//            Mat showMat = OpcvImgUtils.getImageWatermarkWithText(imageMat);
+//            Bitmap  bt4 = Bitmap.createBitmap(showMat.cols(), showMat.rows(), Bitmap.Config.RGB_565);
+//            Utils.matToBitmap(showMat, bt4);
+//
+//
+//            ImageUtils.save(bt4, path + "/" + ImgUtils.getTimeStampFileName(0),  Bitmap.CompressFormat.PNG);
+
+            //imgTest2.setImageBitmap(bt4);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,12 +144,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void extractWaterMark() {
         try {
-            Mat imageMat = Utils.loadResource(this, R.mipmap.a);
-            Mat showMat = OpcvImgUtils.getImageWatermarkWithText(imageMat);
-            Bitmap bt3 = null;
-            bt3 = Bitmap.createBitmap(showMat.cols(), showMat.rows(), Bitmap.Config.RGB_565);
-            Utils.matToBitmap(showMat, bt3);
-            imgTest.setImageBitmap(bt3);
+//            Mat imageMat = Utils.loadResource(this, R.mipmap.a);
+//            Mat showMat = OpcvImgUtils.getImageWatermarkWithText(imageMat);
+//            Bitmap bt3 = null;
+//            bt3 = Bitmap.createBitmap(showMat.cols(), showMat.rows(), Bitmap.Config.RGB_565);
+//            Utils.matToBitmap(showMat, bt3);
+//            imgTest.setImageBitmap(bt3);
+
+            Bitmap bitmap = BitmapFactory.decodeFile(path);
+            Mat temp = new Mat();
+            Utils.bitmapToMat(bitmap, temp);
+
+            Mat showMat = ImgWatermarkUtil.getImageWatermarkWithText(temp);
+            Bitmap  bt4 = Bitmap.createBitmap(showMat.cols(), showMat.rows(), Bitmap.Config.RGB_565);
+            Utils.matToBitmap(showMat, bt4);
+
+            imgTest2.setImageBitmap(bt4);
+            String paths = filePath + "/" + ImgUtils.getTimeStampFileName(0);
+            ImageUtils.save(bt4, paths ,  Bitmap.CompressFormat.PNG);
+
+//            Bitmap bitmap = BitmapFactory.decodeFile(path);
+//            Mat temp = new Mat();
+//            Utils.bitmapToMat(bitmap, temp);
+//            Mat showMat = OpcvImgUtils.getImageWatermarkWithText(temp);
+//            Bitmap  bt3 = Bitmap.createBitmap(showMat.cols(), showMat.rows(), Bitmap.Config.RGB_565);
+//            Utils.matToBitmap(showMat, bt3);
+//            imgTest2.setImageBitmap(bt3);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -152,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Mat src = new Mat();//Mat是OpenCV的一种图像格式
         Mat temp = new Mat();
         Mat dst = new Mat();
-        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.mipmap.a);
+        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.mipmap.ope);
         Utils.bitmapToMat(bitmap, src);
         Imgproc.cvtColor(src, temp, Imgproc.COLOR_RGB2BGR);
         Imgproc.cvtColor(temp, dst, Imgproc.COLOR_BGR2GRAY);
