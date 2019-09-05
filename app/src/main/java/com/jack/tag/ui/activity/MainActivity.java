@@ -12,16 +12,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.PermissionUtils;
-import com.blankj.utilcode.util.StringUtils;
 import com.bumptech.glide.Glide;
 import com.jack.tag.R;
 import com.jack.tag.utils.ImgUtils;
-import com.jack.tag.utils.ImgWatermarkUtil;
 
 import com.jack.tag.utils.OpcvImgUtils;
 import com.luck.picture.lib.PictureSelector;
@@ -31,8 +28,8 @@ import com.luck.picture.lib.entity.LocalMedia;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
@@ -76,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initData() {
         selectList = new ArrayList<>();
 
-        Glide.with(this).load(R.mipmap.ope).into(img);
+        Glide.with(this).load(R.mipmap.a).into(img);
     }
 
     @Override
@@ -102,13 +99,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void addWaterMark() {
         try {
-            Mat imgMat = Utils.loadResource(this, R.mipmap.ope); //Imgcodecs.IMREAD_COLOR /, Imgcodecs.IMREAD_COLOR
-            Mat imageMat = OpcvImgUtils.addImageWatermarkWithText(imgMat, "JACK --- 6666666666666");
+            // TODO: 2019-09-05 水印字迹清晰 但是图片色度变了 
+            Mat imgMat = Utils.loadResource(this, R.mipmap.a); //Imgcodecs.IMREAD_COLOR /, Imgcodecs.IMREAD_COLOR
 
+            // TODO: 2019-09-05 水印字迹不清晰 但是图片正常
+            Bitmap bt = ImgUtils.drawableToBitmap(getResources().getDrawable(R.mipmap.a));
+            Mat src = new Mat(bt.getHeight(), bt.getWidth(), CvType.CV_8U);
+            Utils.bitmapToMat(bt, src);
 
-
-           // DFTUtil.getInstance().createOptimizedMagnitude(imageMat);
-
+            Mat imageMat = OpcvImgUtils.addImageWatermarkWithText(src, "Jack666");
             Bitmap bt3 = null;
             bt3 = Bitmap.createBitmap(imageMat.cols(), imageMat.rows(), Bitmap.Config.RGB_565);
             Utils.matToBitmap(imageMat, bt3);
@@ -127,12 +126,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            Mat showMat = OpcvImgUtils.getImageWatermarkWithText(imageMat);
 //            Bitmap  bt4 = Bitmap.createBitmap(showMat.cols(), showMat.rows(), Bitmap.Config.RGB_565);
 //            Utils.matToBitmap(showMat, bt4);
-//
-//
 //            ImageUtils.save(bt4, path + "/" + ImgUtils.getTimeStampFileName(0),  Bitmap.CompressFormat.PNG);
-
-            //imgTest2.setImageBitmap(bt4);
-
+//            imgTest2.setImageBitmap(bt4);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -144,18 +139,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void extractWaterMark() {
         try {
-//            Mat imageMat = Utils.loadResource(this, R.mipmap.a);
-//            Mat showMat = OpcvImgUtils.getImageWatermarkWithText(imageMat);
-//            Bitmap bt3 = null;
-//            bt3 = Bitmap.createBitmap(showMat.cols(), showMat.rows(), Bitmap.Config.RGB_565);
-//            Utils.matToBitmap(showMat, bt3);
-//            imgTest.setImageBitmap(bt3);
-
             Bitmap bitmap = BitmapFactory.decodeFile(path);
             Mat temp = new Mat();
             Utils.bitmapToMat(bitmap, temp);
 
-            Mat showMat = ImgWatermarkUtil.getImageWatermarkWithText(temp);
+            Mat showMat = OpcvImgUtils.getImageWatermarkWithText(temp);
             Bitmap  bt4 = Bitmap.createBitmap(showMat.cols(), showMat.rows(), Bitmap.Config.RGB_565);
             Utils.matToBitmap(showMat, bt4);
 
@@ -163,13 +151,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String paths = filePath + "/" + ImgUtils.getTimeStampFileName(0);
             ImageUtils.save(bt4, paths ,  Bitmap.CompressFormat.PNG);
 
-//            Bitmap bitmap = BitmapFactory.decodeFile(path);
-//            Mat temp = new Mat();
-//            Utils.bitmapToMat(bitmap, temp);
-//            Mat showMat = OpcvImgUtils.getImageWatermarkWithText(temp);
-//            Bitmap  bt3 = Bitmap.createBitmap(showMat.cols(), showMat.rows(), Bitmap.Config.RGB_565);
-//            Utils.matToBitmap(showMat, bt3);
-//            imgTest2.setImageBitmap(bt3);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -182,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Mat src = new Mat();//Mat是OpenCV的一种图像格式
         Mat temp = new Mat();
         Mat dst = new Mat();
-        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.mipmap.ope);
+        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.mipmap.a);
         Utils.bitmapToMat(bitmap, src);
         Imgproc.cvtColor(src, temp, Imgproc.COLOR_RGB2BGR);
         Imgproc.cvtColor(temp, dst, Imgproc.COLOR_BGR2GRAY);

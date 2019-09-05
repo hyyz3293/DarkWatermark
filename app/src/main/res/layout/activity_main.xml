@@ -39,15 +39,7 @@
 
 
 
-    <TextView
-        android:id="@+id/gary_test"
-        android:background="@color/bar_grey"
-        android:textColor="@color/white"
-        android:text="灰度测试"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:layout_width="130dp"
-        android:layout_height="40dp" />
+
 
 
 
@@ -63,7 +55,25 @@
         android:layout_height="50dp" >
 
         <TextView
+            android:id="@+id/gary_test"
+            android:background="@color/bar_grey"
+            android:textColor="@color/white"
+            android:text="灰度测试"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent" />
+
+        <View
+            android:background="@color/white"
+            android:layout_gravity="center"
+            android:layout_width="1dp"
+            android:layout_height="30dp"/>
+
+        <TextView
             android:id="@+id/tv_change"
+            android:visibility="gone"
             android:textColor="@color/white"
             android:text="选择图片"
             android:gravity="center"
@@ -73,6 +83,7 @@
             android:layout_height="match_parent" />
 
         <View
+            android:visibility="gone"
             android:background="@color/white"
             android:layout_gravity="center"
             android:layout_width="1dp"
